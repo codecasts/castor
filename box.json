@@ -1,0 +1,7 @@
+{
+    "directories": ["src", "vendor"],
+    "files": ["castor"],
+    "main": "castor",
+    "output": "castor.phar",
+    "stub": true
+}
