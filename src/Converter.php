@@ -5,6 +5,8 @@ namespace Castor;
 use Castor\Contracts\Presets\Preset;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
+use FFMpeg\Format\FormatInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Converter
 {
@@ -37,13 +39,21 @@ class Converter
         $video = $this->getFFMpeg()
             ->open($this->sourceFilePath);
 
+
         if (!$keepProportions) {
             $video->filters()->resize($this->preset->getDimensions());
         }
 
         $video->filters()->framerate($this->preset->getFrameRate(), 15);
 
-        $video->save($this->preset->getOutputFormat(), $this->destinationFilePath);
+        $outputFormat = $this->preset->getOutputFormat();
+
+        $outputFormat->on('progress', function($video, $output, $progress) {
+            $instance = ProgressIndicator::instance();
+            $instance->setProgress($progress);
+        });
+
+        $video->save($outputFormat, $this->destinationFilePath);
     }
 
     protected function generateThumbnail()

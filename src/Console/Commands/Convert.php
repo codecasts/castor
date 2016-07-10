@@ -6,6 +6,8 @@ use Castor\Console\FileNotFound;
 use Castor\Converter;
 use Castor\Exceptions\PresetNotFound;
 use Castor\Presets\Screencast;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Helper\ProgressIndicator;
 
 class Convert extends Command
 {
@@ -87,6 +89,9 @@ class Convert extends Command
         }
 
         $converter = new Converter($outputPreset, $sourceFileName, $outputFileName);
+
+
+        \Castor\ProgressIndicator::setOutput($this->output);
 
         $converter->convert(false, true);
 
