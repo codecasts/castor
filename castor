@@ -15,7 +15,7 @@ if (file_exists(__DIR__.'/vendor/autoload.php')) {
 
 // Include composer's autoloader when global dependency.
 if (file_exists(__DIR__.'/../../autoload.php')) {
-    require __DIR__.'/../autoload.php';
+    require __DIR__.'/../../autoload.php';
 }
 
 // Creates a new Castor Application instance.
