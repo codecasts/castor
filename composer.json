@@ -1,0 +1,22 @@
+{
+    "name": "codecasts/castor",
+    "description": "CLI Tool for H264 video manipulations",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Diego Hernandes",
+            "email": "diego@hernandev.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "symfony/console": "^3.1",
+        "php-ffmpeg/php-ffmpeg": "^0.6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Castor\\": "src/"
+        }
+    }
+}

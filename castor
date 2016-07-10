@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Castor Application Entry Point.
+ */
+
+// Import statements.
+use Castor\Console\Application;
+
+// Include composer's autoloader.
+require __DIR__.'/vendor/autoload.php';
+
+// Creates a new Castor Application instance.
+$castor = new Application();
+
+// Run Barry, Run!
+$castor->run();
