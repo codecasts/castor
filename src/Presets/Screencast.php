@@ -6,7 +6,7 @@ use Castor\Contracts\Presets\Preset as PresetContract;
 
 /**
  * Class Screencast.
- * 
+ *
  * Screencast preset to archive lower file size and fast loading
  * on players.
  */
@@ -25,7 +25,7 @@ class Screencast extends Preset implements PresetContract
     /**
      * @var int Smaller Video BitRate for web.
      */
-    protected $kiloBitRate = 1000;
+    protected $kiloBitRate = 600;
 
     /**
      * @var int Smaller Audio BitRate for web.

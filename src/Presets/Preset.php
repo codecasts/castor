@@ -3,6 +3,8 @@
 namespace Castor\Presets;
 
 use Castor\Contracts\Presets\Preset as PresetContract;
+use Castor\Filters\BufSize;
+use Castor\Filters\MaxKiloBitRate;
 use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\FrameRate;
 use FFMpeg\Format\Video\X264;
@@ -63,6 +65,16 @@ abstract class Preset implements PresetContract
             ->setAudioChannels($this->audioChannels);
 
         return $outputFormat;
+    }
+
+    public function getMaxKiloBitRateFilter()
+    {
+        return new MaxKiloBitRate($this->kiloBitRate);
+    }
+
+    public function getBufSizeFilter()
+    {
+        return new BufSize(2 * $this->kiloBitRate);
     }
 
     /**

@@ -93,8 +93,9 @@ class Convert extends Command
 
         \Castor\ProgressIndicator::setOutput($this->output);
 
+        $this->info('');
         $converter->convert(false, true);
-
+        $this->info('');
         $this->info('All Done :)');
     }
 }

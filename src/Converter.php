@@ -3,6 +3,7 @@
 namespace Castor;
 
 use Castor\Contracts\Presets\Preset;
+use Castor\Filters\MaxRate;
 use FFMpeg\Coordinate\TimeCode;
 use FFMpeg\FFMpeg;
 use FFMpeg\Format\FormatInterface;
@@ -45,6 +46,9 @@ class Converter
         }
 
         $video->filters()->framerate($this->preset->getFrameRate(), 15);
+
+        $video->addFilter($this->preset->getMaxKiloBitRateFilter());
+        $video->addFilter($this->preset->getBufSizeFilter());
 
         $outputFormat = $this->preset->getOutputFormat();
 

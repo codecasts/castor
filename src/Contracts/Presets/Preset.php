@@ -9,4 +9,8 @@ interface Preset
     public function getFrameRate();
 
     public function getDimensions();
+
+    public function getMaxKiloBitRateFilter();
+
+    public function getBufSizeFilter();
 }
