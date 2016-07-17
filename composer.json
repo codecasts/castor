@@ -11,8 +11,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "symfony/console": "^3.1",
-        "php-ffmpeg/php-ffmpeg": "^0.6.1"
+        "symfony/console": "^3.1"
     },
     "autoload": {
         "psr-4": {
