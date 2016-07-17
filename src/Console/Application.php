@@ -20,7 +20,7 @@ class Application extends ConsoleApplication
     /**
      * @var string Application Version
      */
-    protected $version = '0.0.1';
+    protected $version = '1.1.0';
 
     /**
      * Castor application constructor.
