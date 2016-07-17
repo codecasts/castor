@@ -3,63 +3,120 @@
 namespace Castor;
 
 use Castor\Contracts\Presets\Preset;
-use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\FFMpeg;
+use Castor\Options\General\AutoConfirm;
+use Castor\Options\General\Input;
+use Castor\Options\General\Output;
+use Castor\Options\Thumbnail\Frames;
+use Castor\Options\Thumbnail\ThumbnailFilter;
+use Castor\Process\Builder;
+use Castor\Process\Process;
 
 class Converter
 {
     protected $sourceFilePath;
 
-    protected $destinationFilePath;
+    protected $outputFilePath;
 
     protected $preset;
 
-    public function __construct(Preset $preset, $sourceFilePath, $destinationFilePath)
+    protected $logFile;
+
+    /**
+     * @var Process
+     */
+    protected $process;
+
+    public function __construct(Preset $preset, $sourceFilePath, $outputFilePath)
     {
         $this->sourceFilePath = $sourceFilePath;
 
-        $this->destinationFilePath = $destinationFilePath;
+        $this->outputFilePath = $outputFilePath;
 
         $this->preset = $preset;
+
+        $this->logFile = '/tmp/castor_'.date('Y-m-d-H:i:s').'.log';
     }
 
-    public function convert($keepProportions = false, $thumbnail = false)
+
+    /**
+     * @return Converter
+     */
+    public function convert()
     {
-        $this->convertVideo($keepProportions);
-
-        if ($thumbnail) {
-            $this->generateThumbnail();
-        }
-    }
-
-    protected function convertVideo($keepProportions = false)
-    {
-        $video = $this->getFFMpeg()
-            ->open($this->sourceFilePath);
-
-        if (!$keepProportions) {
-            $video->filters()->resize($this->preset->getDimensions());
-        }
-
-        $video->filters()->framerate($this->preset->getFrameRate(), 15);
-
-        $video->save($this->preset->getOutputFormat(), $this->destinationFilePath);
-    }
-
-    protected function generateThumbnail()
-    {
-        $video = $this->getFFMpeg()->open($this->destinationFilePath);
-
-        $video
-            ->frame(TimeCode::fromSeconds(60))
-            ->save(str_replace('.mp4', '.jpg', $this->destinationFilePath));
+        return $this->convertVideo();
     }
 
     /**
-     * @return FFMpeg
+     * @return $this
      */
-    protected function getFFMpeg()
+    protected function convertVideo()
     {
-        return FFMpeg::create();
+        $processBuilder = new Builder('ffmpeg');
+
+        // Input file
+        $processBuilder->addOption(new Input($this->sourceFilePath));
+
+        // Auto Confirm all Dialogs
+        $processBuilder->addOption(new AutoConfirm());
+
+        // Preset Options
+        $processBuilder
+            ->addOption($this->preset->videoCodec())
+            ->addOption($this->preset->frameRate())
+            ->addOption($this->preset->bitRate())
+            ->addOption($this->preset->maxRate())
+            ->addOption($this->preset->bufSize())
+            ->addOption($this->preset->scale())
+            ->addOption($this->preset->audioCodec())
+            ->addOption($this->preset->audioBitRate())
+            ->addOption($this->preset->fastStart());
+
+        // Output options
+        $processBuilder->addOption(new Output($this->outputFilePath));
+
+        $this->process = new Process($processBuilder->build());
+
+        $this->process->run(true, $this->logFile);
+
+        return $this;
     }
+
+    /**
+     * @return $this
+     */
+    public function generateThumbnail()
+    {
+        $processBuilder = new Builder('ffmpeg');
+
+        // Input file
+        $processBuilder->addOption(new Input($this->sourceFilePath));
+
+        // Auto Confirm all Dialogs
+        $processBuilder->addOption(new AutoConfirm());
+
+        // Preset Options
+        $processBuilder
+            ->addOption(new ThumbnailFilter())
+            ->addOption(new Frames());
+
+        // Output options
+        $processBuilder->addOption(new Output($this->outputFilePath));
+
+        $this->process = new Process($processBuilder->build());
+
+        $this->process->run();
+
+        return $this;
+    }
+
+    public function running()
+    {
+        return $this->process->running();
+    }
+
+    public function progress()
+    {
+        return (new ProgressParser($this->logFile))->getProgress();
+    }
+
 }

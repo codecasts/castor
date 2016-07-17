@@ -4,9 +4,48 @@ namespace Castor\Contracts\Presets;
 
 interface Preset
 {
-    public function getOutputFormat();
+    /**
+     * @return Option|null
+     */
+    public function videoCodec();
 
-    public function getFrameRate();
+    /**
+     * @return Option|null
+     */
+    public function frameRate();
 
-    public function getDimensions();
+    /**
+     * @return Option|null
+     */
+    public function bitRate();
+
+    /**
+     * @return Option|null
+     */
+    public function maxRate();
+
+    /**
+     * @return Option|null
+     */
+    public function bufSize();
+
+    /**
+     * @return Option|null
+     */
+    public function scale();
+
+    /**
+     * @return Option|null
+     */
+    public function audioCodec();
+
+    /**
+     * @return Option|null
+     */
+    public function audioBitRate();
+
+    /**
+     * @return Option|null
+     */
+    public function fastStart();
 }

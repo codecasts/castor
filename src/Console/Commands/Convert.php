@@ -3,9 +3,11 @@
 namespace Castor\Console\Commands;
 
 use Castor\Console\FileNotFound;
+use Castor\Contracts\Presets\Preset;
 use Castor\Converter;
 use Castor\Exceptions\PresetNotFound;
 use Castor\Presets\Screencast;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class Convert extends Command
 {
@@ -27,7 +29,40 @@ class Convert extends Command
         'screencast' => Screencast::class,
     ];
 
-    protected function getSourceFileName()
+    /**
+     * @var string
+     */
+    protected $sourceFilePath;
+
+    /**
+     * @var string
+     */
+    protected $outputFilePath;
+
+    /**
+     * @var Preset
+     */
+    protected $outputPreset;
+
+    /**
+     * @var bool
+     */
+    protected $thumbnailEnabled;
+
+    /**
+     * @var string
+     */
+    protected $thumbnailPath;
+
+    /**
+     * @var ProgressBar
+     */
+    protected $progressBar;
+
+    /**
+     * @return string
+     */
+    protected function getSourceFilePath()
     {
         // Detect Real file name
         $sourceFileName = realpath($this->input->getArgument('source'));
@@ -40,14 +75,17 @@ class Convert extends Command
         return $sourceFileName;
     }
 
-    protected function getOutputFileName($sourceFileName)
+    /**
+     * @return mixed
+     */
+    protected function getOutputFilePath()
     {
-        $outputFileName = $this->input->getArgument('output');
-        if (!$outputFileName) {
-            $outputFileName = str_replace('.mp4', '_out.mp4', $sourceFileName);
+        $outputFilePath = $this->input->getArgument('output');
+        if (!$outputFilePath) {
+            $outputFilePath = str_replace('.mp4', '_out.mp4', $this->sourceFilePath);
         }
 
-        return $outputFileName;
+        return $outputFilePath;
     }
 
     protected function getOutputPreset()
@@ -63,33 +101,87 @@ class Convert extends Command
 
     protected function shouldGenerateThumbnail()
     {
-        return $this->input->getOption('thumbnail');
+        return (bool) $this->input->getOption('thumbnail');
+    }
+
+    protected function detectOptions()
+    {
+        // Source file path
+        $this->sourceFilePath = $this->getSourceFilePath();
+
+        // Output file name
+        $this->outputFilePath = $this->getOutputFilePath();
+
+        // Using the preset
+        $this->outputPreset = $this->getOutputPreset();
+
+        // Generate Thumbnail?
+        $this->thumbnailEnabled = $this->shouldGenerateThumbnail();
+
+        if ($this->thumbnailEnabled) {
+            $this->thumbnailPath = str_replace('.mp4', '.jpg', $this->outputFilePath);
+        }
+
     }
 
     protected function fire()
     {
-        // Source file name
-        $sourceFileName = $this->getSourceFileName();
+        $this->detectOptions();
 
-        // Output file name
-        $outputFileName = $this->getOutputFileName($sourceFileName);
+        $this->comment("Converting: {$this->sourceFilePath}\n");
+        $this->comment("Output Video: {$this->outputFilePath}\n");
 
-        // Using the preset
-        $outputPreset = $this->getOutputPreset();
-
-        // Generate Thumbnail?
-        $shouldGenerateThumbnail = $this->shouldGenerateThumbnail();
-
-        $this->info("Converting: {$sourceFileName}");
-        $this->info("Output File: {$outputFileName}");
-        if ($shouldGenerateThumbnail) {
-            $this->info('Thumbnail will be generated at the same folder');
+        if ($this->thumbnailEnabled) {
+            $this->comment("Output Thumbnail: {$this->thumbnailPath}");
         }
 
-        $converter = new Converter($outputPreset, $sourceFileName, $outputFileName);
+        $this->info("\n\nHold on...\n\n");
 
-        $converter->convert(false, true);
+        $converter = new Converter(
+            $this->outputPreset,
+            $this->sourceFilePath,
+            $this->outputFilePath);
 
-        $this->info('All Done :)');
+        $converter = $converter->convert(false);
+
+        $this->startProgressBar();
+
+        while($converter->running()) {
+            $this->setProgress($converter->progress());
+            sleep(3);
+        }
+
+        $this->info("\n\nVideo Converted!");
+
+        if ($this->thumbnailEnabled) {
+            $this->comment("\n\nGenerating Thumbnail...");
+
+            $converter = new Converter(
+                $this->outputPreset,
+                $this->outputFilePath,
+                $this->thumbnailPath
+            );
+
+            $converter->generateThumbnail();
+        }
+
+
+        $this->info("\n\nAll Done, That's all folks :)\n\n");
+    }
+
+    protected function startProgressBar()
+    {
+        $this->progressBar = new ProgressBar($this->output, 100);
+    }
+
+    protected function setProgress($percentage)
+    {
+        $this->progressBar->setProgress($percentage);
+    }
+
+    protected function finishProgressBar()
+    {
+        $this->progressBar->setProgress(100);
+        $this->progressBar->finish();
     }
 }
