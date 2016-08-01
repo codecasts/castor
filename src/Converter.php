@@ -8,6 +8,7 @@ use Castor\Options\General\Input;
 use Castor\Options\General\Output;
 use Castor\Options\Thumbnail\Frames;
 use Castor\Options\Thumbnail\ThumbnailFilter;
+use Castor\Options\Video\WaterMarkFilter;
 use Castor\Process\Builder;
 use Castor\Process\Process;
 
@@ -46,12 +47,22 @@ class Converter
         return $this->convertVideo();
     }
 
+    protected function prepareWaterMarkFile()
+    {
+        $waterMarkPath = __DIR__.'/../files/watermark.png';
+
+        copy($waterMarkPath, '/tmp/castor.png');
+    }
+
     /**
      * @return $this
      */
     protected function convertVideo()
     {
         $processBuilder = new Builder('ffmpeg');
+
+        // prepare a temporary file for the watermark png
+        $this->prepareWaterMarkFile();
 
         // Input file
         $processBuilder->addOption(new Input($this->sourceFilePath));
@@ -69,6 +80,7 @@ class Converter
             ->addOption($this->preset->scale())
             ->addOption($this->preset->audioCodec())
             ->addOption($this->preset->audioBitRate())
+            ->addOption(new WaterMarkFilter())
             ->addOption($this->preset->fastStart());
 
         // Output options

@@ -1,5 +1,5 @@
 {
-    "directories": ["src", "vendor"],
+    "directories": ["src", "vendor", "files"],
     "files": ["castor"],
     "main": "castor",
     "output": "castor.phar",
