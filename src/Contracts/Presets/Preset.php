@@ -48,4 +48,9 @@ interface Preset
      * @return Option|null
      */
     public function fastStart();
+
+    /**
+     * @return string
+     */
+    public function getWaterMarkFileName();
 }

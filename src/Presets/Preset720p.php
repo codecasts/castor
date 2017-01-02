@@ -5,12 +5,12 @@ namespace Castor\Presets;
 use Castor\Contracts\Presets\Preset as PresetContract;
 
 /**
- * Class Screencast.
+ * Class Preset720p.
  *
- * Screencast preset to archive lower file size and fast loading
+ * Preset720p preset to archive lower file size and fast loading
  * on players.
  */
-class Screencast extends H264 implements PresetContract
+class Preset720p extends H264 implements PresetContract
 {
     /**
      * @var int Lower FPS.
@@ -36,4 +36,9 @@ class Screencast extends H264 implements PresetContract
      * @var int 128 is enough.
      */
     protected $audioBitRate = 128;
+
+    /**
+     * @var string Watermark file
+     */
+    protected $waterMarkFile = 'castor720.png';
 }

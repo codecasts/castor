@@ -6,6 +6,8 @@ use Castor\Console\FileNotFound;
 use Castor\Contracts\Presets\Preset;
 use Castor\Converter;
 use Castor\Exceptions\PresetNotFound;
+use Castor\Presets\Preset1080p;
+use Castor\Presets\Preset720p;
 use Castor\Presets\Screencast;
 use Symfony\Component\Console\Helper\ProgressBar;
 
@@ -21,12 +23,13 @@ class Convert extends Command
     ];
 
     protected $options = [
-        ['preset', 's', self::OPTIONAL_VALUE_OPTION, 'Preset to use', 'screencast'],
+        ['preset', 's', self::OPTIONAL_VALUE_OPTION, 'Preset to use', '720p'],
         ['thumbnail', 't', self::OPTIONAL_VALUE_OPTION, 'Generates a Thumbnail of the Resulting Video', false],
     ];
 
     protected $presets = [
-        'screencast' => Screencast::class,
+        '720p' => Preset720p::class,
+        '1080p' => Preset1080p::class,
     ];
 
     /**

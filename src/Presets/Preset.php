@@ -37,6 +37,8 @@ abstract class Preset implements PresetContract
 
     protected $fastStart = true;
 
+    protected $waterMarkFile = null;
+
     /**
      * @param $value
      * @param $class
@@ -130,5 +132,10 @@ abstract class Preset implements PresetContract
         }
 
         return null;
+    }
+
+    public function getWaterMarkFileName()
+    {
+        return $this->waterMarkFile;
     }
 }

@@ -49,7 +49,7 @@ class Converter
 
     protected function prepareWaterMarkFile()
     {
-        $waterMarkPath = __DIR__.'/../files/watermark.png';
+        $waterMarkPath = __DIR__.'/../files/'.$this->preset->getWaterMarkFileName();
 
         copy($waterMarkPath, '/tmp/castor.png');
     }
